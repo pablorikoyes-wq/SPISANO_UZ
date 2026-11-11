@@ -229,6 +229,15 @@ function orderMarkup(){
 
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===id));
+  
+  // Скрываем зеленую плашку, если мы ушли с экрана каталога
+  if (id !== 'catalogScreen') {
+    $('cartBar').classList.remove('show');
+  } else if (cart.length > 0) {
+    // Если вернулись в каталог и корзина не пуста — показываем снова
+    $('cartBar').classList.add('show');
+  }
+  
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -256,10 +265,18 @@ function renderChannels(){
 function unlockOrder(){
   $('claimSummary').innerHTML=orderMarkup();
   $('claimTotal').textContent=money(cart.length);
+  $('cartBar').classList.remove('show'); 
   burst(55);
   showScreen('successScreen');
-}
 
+  // Закрываем Mini App через 2 секунды после показа экрана успеха
+  setTimeout(() => {
+    if (tg && tg.close) {
+      try { tg.close(); } catch(e) {}
+    }
+  }, 2000);
+}
+  
 async function verifySubscription(){
   const btn=$('verifyButton'),err=$('errorMessage');
   err.textContent='';
